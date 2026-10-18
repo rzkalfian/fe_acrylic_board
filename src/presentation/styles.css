@@ -463,3 +463,9 @@ input::placeholder, textarea::placeholder { color: #75606a; opacity: 1; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+.order-section { padding-block: 40px 60px; scroll-margin-top: 96px; }
+.order-section h2 { text-align: center; margin-bottom: 28px; }
+.order-grid { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 32px; align-items: start; }
+.order-summary { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+.order-summary img { width: 100%; height: auto; border-radius: 6px; }
+@media (max-width: 800px) { .order-grid { grid-template-columns: 1fr; } }

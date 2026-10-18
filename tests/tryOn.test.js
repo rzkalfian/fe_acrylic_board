@@ -75,3 +75,13 @@ test('repository menolak endpoint kosong, response gagal, dan URL berbahaya', as
     await assert.rejects(createTryOnRepository('/ai', async () => Response.json({ generated_image_url: url })).generate(input), /URL/);
   }
 });
+test('pesan WhatsApp memuat isi try on, hasil gambar, dan data pemesan', async () => {
+  const { buildOrderMessage } = await import('../src/domain/tryOn.js');
+  const text = buildOrderMessage({
+    product: { name: 'Papan', price: 1000 }, variant: { code: 'P1', label: 'Merah' },
+    fields: { ...input.fields, ucapan_selamat_font: 'script' }, resultUrl: 'https://x.test/r.webp',
+    customer: { name: 'Budi', phone: '0812', address: 'Jl. A', quantity: 2, note: '' }, formatPrice: String,
+  });
+  for (const part of ['P1 - Merah', '1000 x 2 = 2000', 'Ucapan: Selamat [Script]', 'https://x.test/r.webp', 'Nama: Budi']) assert.ok(text.includes(part), part);
+  assert.ok(!text.includes('Catatan'));
+});

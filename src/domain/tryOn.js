@@ -31,3 +31,27 @@ export function validateCustomization({ methodType, fields, file, variant }) {
     if (!fields?.[field]?.trim()) throw new Error(`${label} wajib diisi.`);
   }
 }
+const labelOf = (options, value) => options.find(([key]) => key === value)?.[1];
+
+export function buildOrderMessage({ product, variant, fields, resultUrl, customer, formatPrice }) {
+  const quantity = Number(customer.quantity);
+  const lines = [
+    'Halo Dipi Floriest, saya ingin memesan papan akrilik sesuai hasil Try On:',
+    '',
+    `Produk: ${product.name} (${variant.code} - ${variant.label})`,
+    `Harga: ${formatPrice(product.price)} x ${quantity} = ${formatPrice(product.price * quantity)}`,
+    '',
+    'Isi papan:',
+  ];
+  for (const [name, title] of [['ucapan_selamat', 'Ucapan'], ['tambahan', 'Tambahan'], ['pesan', 'Pesan'], ['kepada', 'Kepada'], ['dari', 'Dari']]) {
+    if (!fields[name]?.trim()) continue;
+    const style = [['font', fontOptions], ['style', styleOptions], ['size', sizeOptions]]
+      .map(([kind, options]) => fields[`${name}_${kind}`] && labelOf(options, fields[`${name}_${kind}`])).filter(Boolean).join(', ');
+    lines.push(`- ${title}: ${fields[name].trim()}${style ? ` [${style}]` : ''}`);
+  }
+  if (fields.atribut) lines.push(`Atribut: ${fields.atribut}`);
+  if (fields.posisi) lines.push(`Posisi: ${fields.posisi}`);
+  lines.push('', `Hasil Try On: ${resultUrl}`, '', `Nama: ${customer.name.trim()}`, `WhatsApp: ${customer.phone.trim()}`, `Alamat: ${customer.address.trim()}`);
+  if (customer.note?.trim()) lines.push(`Catatan: ${customer.note.trim()}`);
+  return lines.join('\n');
+}

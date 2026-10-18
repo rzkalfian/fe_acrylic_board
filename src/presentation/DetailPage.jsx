@@ -1,8 +1,42 @@
 import { Link, useParams } from 'react-router-dom';
-import { useApp } from './context.jsx';
+import { useState } from 'react';
 import { useProducts, useTryOn } from './hooks.js';
 import { formatPrice, ProductImage, ResourceState, SelectWrap, SolarIcon } from './components.jsx';
-import { fontOptions, sizeOptions, styleOptions } from '../domain/tryOn.js';
+import { buildOrderMessage, fontOptions, sizeOptions, styleOptions } from '../domain/tryOn.js';
+
+const shopWhatsapp = (import.meta.env.VITE_SHOP_WHATSAPP || '').replace(/\D/g, '');
+
+function OrderForm({ product, variant, fields, resultUrl }) {
+  const [customer, setCustomer] = useState({ name: '', phone: '', address: '', quantity: 1, note: '' });
+  const [error, setError] = useState('');
+  const set = (name) => (event) => setCustomer((current) => ({ ...current, [name]: event.target.value }));
+  const total = product.price * (Number(customer.quantity) || 0);
+
+  function submit(event) {
+    event.preventDefault();
+    if (!shopWhatsapp) return setError('Nomor WhatsApp toko belum diatur (VITE_SHOP_WHATSAPP).');
+    const message = buildOrderMessage({ product, variant, fields, resultUrl: new URL(resultUrl, window.location.href).href, customer, formatPrice });
+    window.open(`https://wa.me/${shopWhatsapp}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+  }
+
+  return <section className="order-section" id="order" aria-labelledby="order-title">
+    <h2 id="order-title"><strong>PESAN</strong> SESUAI TRY ON</h2>
+    <div className="order-grid">
+      <div className="order-summary"><ProductImage key={resultUrl} src={resultUrl} alt="Hasil Try On yang dipesan" width="320" height="320" /><p>{product.name}<br />{variant.code} · {variant.label}</p><strong>{formatPrice(total)}</strong></div>
+      <form className="try-on-form order-form" onSubmit={submit}>
+        <div className="form-fields">
+          <label>Nama Lengkap<abbr className="required" title="wajib diisi"> *</abbr><input required maxLength="120" autoComplete="name" value={customer.name} onChange={set('name')} /></label>
+          <label>Nomor WhatsApp<abbr className="required" title="wajib diisi"> *</abbr><input required type="tel" maxLength="20" autoComplete="tel" value={customer.phone} onChange={set('phone')} /></label>
+          <label className="full-width">Alamat Pengiriman<abbr className="required" title="wajib diisi"> *</abbr><textarea required rows="2" maxLength="300" autoComplete="street-address" value={customer.address} onChange={set('address')} /></label>
+          <label>Jumlah<input type="number" min="1" max="99" required value={customer.quantity} onChange={set('quantity')} /></label>
+          <label>Catatan (Opsional)<input maxLength="200" value={customer.note} onChange={set('note')} /></label>
+        </div>
+        {error && <p className="form-error" role="alert"><SolarIcon name="danger-circle" /> {error}</p>}
+        <button type="submit" className="button button-wide"><SolarIcon name="bag-4" /> Pesan via WhatsApp</button>
+      </form>
+    </div>
+  </section>;
+}
 
 function FieldTools({ name, label, fields, updateField }) {
   const controls = [['font', 'Font', fontOptions], ['style', 'Gaya', styleOptions], ['size', 'Ukuran', sizeOptions]];
@@ -19,7 +53,6 @@ export function DetailPage() {
 
 function ProductDetail({ product }) {
   const tryOn = useTryOn(product);
-  const { addToCart } = useApp();
   const { selectedVariant, selectVariant, fields, updateField, methodType, switchMethod, file, chooseFile, isLoading, generatedResultUrl, error, generate } = tryOn;
   const required = methodType === 'FORM';
   const preview = generatedResultUrl || selectedVariant.imageUrl;
@@ -31,7 +64,7 @@ function ProductDetail({ product }) {
       </div>
       <div className="product-info"><h1>Papan Akrilik Greeting<span>Warna {product.color}</span></h1><p className="product-price">{formatPrice(product.price)}</p><p className="product-description">{product.description}</p>
         <div className="variant-list">{product.variants.map((variant) => <button key={variant.code} type="button" className={selectedVariant.code === variant.code ? 'variant selected' : 'variant'} aria-label={`Pilih ${variant.code}, ${variant.label}`} aria-pressed={selectedVariant.code === variant.code} onClick={() => selectVariant(variant)}><ProductImage src={variant.imageUrl} alt="" width="70" height="70" /><span>{variant.code}</span></button>)}</div>
-        <div className="product-actions"><button type="button" className="button" onClick={() => addToCart(product, selectedVariant)}><SolarIcon name="bag-4" /> Pesan Sekarang</button></div>
+        <div className="product-actions"><a className="button" href={generatedResultUrl ? '#order' : '#try-on'}><SolarIcon name="bag-4" /> Pesan Sekarang</a></div>
       </div>
     </section>
     <section className="try-on-section" id="try-on">
@@ -65,5 +98,6 @@ function ProductDetail({ product }) {
         </form>
       </div>
     </section>
+    {generatedResultUrl && <OrderForm product={product} variant={selectedVariant} fields={fields} resultUrl={generatedResultUrl} />}
   </div></div>;
 }

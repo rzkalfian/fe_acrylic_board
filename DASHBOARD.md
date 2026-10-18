@@ -5,6 +5,7 @@ Dokumentasi struktur elemen dan komponen layout utama untuk halaman Landing Page
 ---
 
 ## 1. Header & Navigation Bar
+
 - **Logo:** `assets/flower-logo.png`
 - **Menu Navigasi:**
   - Home
@@ -20,6 +21,7 @@ Dokumentasi struktur elemen dan komponen layout utama untuk halaman Landing Page
 ---
 
 ## 2. Hero Section
+
 - **Headline Main Title:** "Hello Floriest" (atau Banner Utama)
 - **Sub-headline / Description:** Tagline toko bunga & layanan pengiriman.
 - **Call-to-Action (CTA):** Button "Shop Now" / "Explore Catalog"
@@ -31,20 +33,22 @@ Dokumentasi struktur elemen dan komponen layout utama untuk halaman Landing Page
 ---
 
 ## 3. Services / Speciality Section
+
 Kategori layanan utama dalam bentuk card circular/icon box:
 
-| Layanan | Asset Icon / Gambar |
-| :--- | :--- |
-| **Flower Bouquet** | `assets/service-flower.png` (`flower-bouquet_12844707.png`) |
-| **Birthday Flower** | `assets/service-birthday.png` (`cake_882755.png`) |
-| **Greeting / Service Card** | `assets/service-card.png` (`presentation_6942758.png`) |
-| **Married / Wedding** | `assets/service-merried.png` (`rings_6549080.png`) |
-| **Baby Born** | `assets/service-baby.png` (`baby_822225.png`) |
-| **Car Flower Decoration** | `assets/car-flower.png` |
+| Layanan                     | Asset Icon / Gambar                                         |
+| :-------------------------- | :---------------------------------------------------------- |
+| **Flower Bouquet**          | `assets/service-flower.png` (`flower-bouquet_12844707.png`) |
+| **Birthday Flower**         | `assets/service-birthday.png` (`cake_882755.png`)           |
+| **Greeting / Service Card** | `assets/service-card.png` (`presentation_6942758.png`)      |
+| **Married / Wedding**       | `assets/service-merried.png` (`rings_6549080.png`)          |
+| **Baby Born**               | `assets/service-baby.png` (`baby_822225.png`)               |
+| **Car Flower Decoration**   | `assets/car-flower.png`                                     |
 
 ---
 
 ## 4. Banner Happiness / Highlight Section
+
 - **Headline:** "Spreading Happiness with Flowers"
 - **Sub-content:** Penjelasan singkat keunggulan perangkaian dan kesegaran bunga.
 - **Assets Gambar:**
@@ -53,18 +57,20 @@ Kategori layanan utama dalam bentuk card circular/icon box:
 ---
 
 ## 5. Catalog / Product Grid (Best Seller)
+
 Grid produk pilihan yang menampilkan daftar produk terlaris.
 
 - **Komponen Product Card:**
   - Gambar Produk (`assets/product-thumb-x.png`)
-  - Nama Produk (contoh: *Papan Akrilik / Buket Bunga*)
-  - Harga (contoh: *Rp 120.000,00*)
+  - Nama Produk (contoh: _Papan Akrilik / Buket Bunga_)
+  - Harga (contoh: _Rp 120.000,00_)
   - Button Action: "Add to Cart" / "Detail"
 - **Jumlah Layout Grid:** 3 - 4 Kolom
 
 ---
 
 ## 6. Testimonial / Reviews Section
+
 - **Card Testimoni:**
   - Foto Profile Pelanggan
   - Nama Pelanggan
@@ -75,6 +81,7 @@ Grid produk pilihan yang menampilkan daftar produk terlaris.
 ---
 
 ## 7. About Us & Footer Section
+
 - **Tentang Dipi Floriest:** Penjelasan singkat toko dan visi layanan.
 - **Informasi Kontak & Jam Operasional:** Alamat, No. HP/WhatsApp, Email.
 - **Quick Links:** Link kebijakan, FAQ, dan syarat ketentuan.

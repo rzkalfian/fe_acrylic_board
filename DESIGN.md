@@ -5,6 +5,7 @@
 ResortLux is a premium, romantic, and serene design system for luxury resorts and boutique hotel websites. It combines full-bleed hospitality imagery, a layered pink palette, elegant typography, selective glassmorphism, and decorative background ornaments.
 
 The visual direction should feel:
+
 - Elegant and premium
 - Romantic, warm, and welcoming
 - Serene and uncluttered
@@ -17,25 +18,25 @@ Use generous whitespace and strong visual hierarchy. Avoid overcrowding pages or
 
 ### Core palette
 
-| Token | Hex | Intended use |
-|---|---|---|
-| `color-primary` | `#E44D99` | Primary actions, booking CTAs, selected states |
-| `color-rose` | `#BD5C80` | Accent headings, icon accents, emphasis |
+| Token              | Hex       | Intended use                                   |
+| ------------------ | --------- | ---------------------------------------------- |
+| `color-primary`    | `#E44D99` | Primary actions, booking CTAs, selected states |
+| `color-rose`       | `#BD5C80` | Accent headings, icon accents, emphasis        |
 | `color-dusty-pink` | `#D7869B` | Decorative details, borders, secondary accents |
-| `color-blush` | `#F5B1BD` | Highlights, soft fills, glass tint |
-| `color-soft-pink` | `#FAD9DB` | Soft backgrounds and subtle section fills |
+| `color-blush`      | `#F5B1BD` | Highlights, soft fills, glass tint             |
+| `color-soft-pink`  | `#FAD9DB` | Soft backgrounds and subtle section fills      |
 
 ### Neutral and semantic colors
 
-| Token | Hex | Intended use |
-|---|---|---|
-| `color-background` | `#FFFFF0` | Main page background (ivory) |
-| `color-surface` | `#FFFFFF` | Cards, dialogs, elevated surfaces |
-| `color-text` | `#0F172A` | Primary text and headings (navy) |
-| `color-success` | `#15803D` | Success states |
-| `color-warning` | `#CA8A04` | Warning states |
-| `color-error` | `#DC2626` | Error states |
-| `color-info` | `#0369A1` | Informational states |
+| Token              | Hex       | Intended use                      |
+| ------------------ | --------- | --------------------------------- |
+| `color-background` | `#FFFFF0` | Main page background (ivory)      |
+| `color-surface`    | `#FFFFFF` | Cards, dialogs, elevated surfaces |
+| `color-text`       | `#0F172A` | Primary text and headings (navy)  |
+| `color-success`    | `#15803D` | Success states                    |
+| `color-warning`    | `#CA8A04` | Warning states                    |
+| `color-error`      | `#DC2626` | Error states                      |
+| `color-info`       | `#0369A1` | Informational states              |
 
 ### Color usage rules
 
@@ -56,11 +57,13 @@ ResortLux uses three font families with distinct roles.
 **Token:** `font-script`
 
 Use for:
+
 - Short decorative phrases
 - Hero script accents and romantic taglines
 - Small editorial flourishes
 
 Rules:
+
 - Use sparingly and pair with a readable heading.
 - Do not use for body copy, navigation, prices, form labels, or essential booking information.
 - Avoid long sentences and small font sizes.
@@ -70,6 +73,7 @@ Rules:
 **Token:** `font-heading`
 
 Use for:
+
 - Page titles and section headings
 - Room and suite names
 - Feature headings and prominent promotional titles
@@ -81,6 +85,7 @@ Recommended weights: 500, 600, and 700, depending on hierarchy. Keep heading lin
 **Token:** `font-body`
 
 Use for:
+
 - Descriptions and paragraphs
 - Navigation and buttons
 - Form labels and helper text
@@ -90,21 +95,22 @@ Recommended weights: 400 for body copy, 600 for emphasis, and 700 for compact la
 
 ### Typography hierarchy
 
-| Element | Font | Guidance |
-|---|---|---|
-| Decorative tagline | Qwigley | Short, expressive, decorative |
-| H1 | Poppins | Strongest page heading |
-| H2 | Poppins | Section heading |
-| H3 / card title | Poppins | Compact heading |
-| Body / description | Nunito Sans | Readable, relaxed line-height |
-| Navigation / button | Nunito Sans | Clear and action-oriented |
-| Price / form label | Nunito Sans | Functional and legible |
+| Element             | Font        | Guidance                      |
+| ------------------- | ----------- | ----------------------------- |
+| Decorative tagline  | Qwigley     | Short, expressive, decorative |
+| H1                  | Poppins     | Strongest page heading        |
+| H2                  | Poppins     | Section heading               |
+| H3 / card title     | Poppins     | Compact heading               |
+| Body / description  | Nunito Sans | Readable, relaxed line-height |
+| Navigation / button | Nunito Sans | Clear and action-oriented     |
+| Price / form label  | Nunito Sans | Functional and legible        |
 
 ## 4. Iconography — Solar Icons
 
 Use **Solar Icons** as the standard icon family throughout the interface.
 
 Recommended approach:
+
 - Prefer the Outline style for a refined, lightweight appearance.
 - Use Bold or filled variants selectively for active navigation, selected states, or high-priority actions.
 - Keep icon style, stroke weight, and visual size consistent within the same context.
@@ -136,12 +142,14 @@ Choose the Solar Icons package or asset format that matches the project's framew
 ## 6. Glassmorphism
 
 Glass effects may be used selectively for:
+
 - Transparent navigation over hero imagery
 - Floating booking/search panels
 - Small overlays on photography
 - Contextual floating controls
 
 Suggested visual properties:
+
 - Translucent white or blush-tinted surface
 - `backdrop-filter: blur(12px)` to `blur(20px)`
 - Thin, semi-transparent light border
@@ -149,6 +157,7 @@ Suggested visual properties:
 - Rounded corners consistent with the component
 
 Rules:
+
 - Use glass only when it improves layering or context.
 - Maintain readable contrast for text, icons, and buttons.
 - Avoid glass effects behind long blocks of body text.
@@ -160,6 +169,7 @@ Rules:
 Decorative assets are available in `assets/background` and should be reused where appropriate.
 
 Usage guidelines:
+
 - Inspect the available assets before choosing one for a specific page.
 - Use ornaments as supporting decoration, not as the main content.
 - Position ornaments around section edges, corners, or open whitespace.
@@ -177,6 +187,7 @@ Do not assume filenames or asset contents. Review the actual files in `assets/ba
 Booking actions are a primary conversion goal.
 
 ### Primary CTA
+
 - Background: `#E44D99`
 - Text: white, after contrast verification
 - Shape: pill or consistently rounded rectangle
@@ -184,11 +195,13 @@ Booking actions are a primary conversion goal.
 - Use for actions such as “Book Now”, “Check Availability”, or “Reserve a Room”
 
 ### Secondary CTA
+
 - Use a white or ivory surface with a rose border or navy text.
 - Make its hierarchy visibly lower than the primary CTA.
 - Maintain clear hover, focus, pressed, and disabled states.
 
 ### Interaction rules
+
 - Make booking CTAs easy to locate without making every action equally prominent.
 - Provide visible keyboard focus.
 - Use descriptive action labels.
@@ -229,22 +242,22 @@ Booking actions are a primary conversion goal.
 ```css
 :root {
   /* Brand colors */
-  --color-primary: #E44D99;
-  --color-rose: #BD5C80;
-  --color-dusty-pink: #D7869B;
-  --color-blush: #F5B1BD;
-  --color-soft-pink: #FAD9DB;
+  --color-primary: #e44d99;
+  --color-rose: #bd5c80;
+  --color-dusty-pink: #d7869b;
+  --color-blush: #f5b1bd;
+  --color-soft-pink: #fad9db;
 
   /* Neutral colors */
-  --color-background: #FFFFF0;
-  --color-surface: #FFFFFF;
-  --color-text: #0F172A;
+  --color-background: #fffff0;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
 
   /* Semantic colors */
-  --color-success: #15803D;
-  --color-warning: #CA8A04;
-  --color-error: #DC2626;
-  --color-info: #0369A1;
+  --color-success: #15803d;
+  --color-warning: #ca8a04;
+  --color-error: #dc2626;
+  --color-info: #0369a1;
 
   /* Typography */
   --font-script: "Qwigley", cursive;
@@ -293,7 +306,7 @@ h6 {
 .button-primary {
   border-radius: var(--radius-button);
   background: var(--color-primary);
-  color: #FFFFFF;
+  color: #ffffff;
   font-family: var(--font-body);
   font-weight: 700;
 }

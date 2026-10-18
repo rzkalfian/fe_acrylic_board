@@ -17,13 +17,15 @@ Dokumentasi spesifikasi alur kerja komponen Frontend React JS untuk halaman **De
 ## 2. Struktur Komponen & Static Data Mock
 
 ### Static Mock Data (`src/data/products.js`)
+
 ```javascript
 export const dummyProductDetail = {
   id: "prod-001",
   name: "PAPAN AKRILIK WARNA MERAH",
   category: "Akrilik / Flower Board",
   price: 120000,
-  description: "Papan akrilik dengan desain bunga di bagian atas dan bagian bawah dengan perpaduan kombinasi 2 warna, warna bisa dipilih di bagian kategori yang disediakan.",
+  description:
+    "Papan akrilik dengan desain bunga di bagian atas dan bagian bawah dengan perpaduan kombinasi 2 warna, warna bisa dipilih di bagian kategori yang disediakan.",
   variants: [
     { code: "P1", imageUrl: "/assets/products/p1.webp" },
     { code: "P2", imageUrl: "/assets/products/p2.webp" },
@@ -32,8 +34,8 @@ export const dummyProductDetail = {
     { code: "P5", imageUrl: "/assets/products/p5.webp" },
     { code: "P6", imageUrl: "/assets/products/p6.webp" },
     { code: "P7", imageUrl: "/assets/products/p7.webp" },
-    { code: "P8", imageUrl: "/assets/products/p8.webp" }
-  ]
+    { code: "P8", imageUrl: "/assets/products/p8.webp" },
+  ],
 };
 ```
 
@@ -44,9 +46,9 @@ export const dummyProductDetail = {
 ### Step 1: Initial Page Load
 
 - Aplikasi memuat `dummyProductDetail`.
-- Varian pertama (`P1`) diset sebagai varian aktif awal secara *default*.
+- Varian pertama (`P1`) diset sebagai varian aktif awal secara _default_.
 - Gambar di **Main Product Preview** (atas) dan **Try On Preview Area** (bawah) menampilkan aset `p1.webp`.
-- Status `generatedResultUrl` bernilai `null` dan teks penanda *"Pilih Gambar dan Lihat Hasil Disini"* tampil di bawah preview Try On.
+- Status `generatedResultUrl` bernilai `null` dan teks penanda _"Pilih Gambar dan Lihat Hasil Disini"_ tampil di bawah preview Try On.
 
 ### Step 2: Selecting Category/Variant (P1 - P8)
 
@@ -65,15 +67,15 @@ export const dummyProductDetail = {
 
 - Pengguna mengklik tombol **"Generate Image"**.
 - State `isLoading` berubah menjadi `true`.
-- UI menampilkan *loading spinner* / *skeleton animation* pada **Try On Preview Area** dan tombol `Generate Image` menjadi *disabled*.
+- UI menampilkan _loading spinner_ / _skeleton animation_ pada **Try On Preview Area** dan tombol `Generate Image` menjadi _disabled_.
 - Hook presentation memanggil use case `generateTryOn` dengan input kustomisasi dan varian aktif.
 - Use case memvalidasi input dan memanggil kontrak repository. Implementasi repository di infrastructure membuat payload `FormData` dan melakukan HTTP POST ke Endpoint AI Backend.
 
 ### Step 5: Rendering AI Result
 
-- Backend mengembalikan *response* sukses berisi URL gambar WebP baru (`generated_image_url`).
+- Backend mengembalikan _response_ sukses berisi URL gambar WebP baru (`generated_image_url`).
 - State `generatedResultUrl` terisi dengan URL tersebut dan `isLoading` berubah menjadi `false`.
-- **Try On Preview Area** secara halus *(fade-in transition)* mengganti gambar sampel produk dengan hasil visualisasi AI di posisi frame/papan yang sama.
+- **Try On Preview Area** secara halus _(fade-in transition)_ mengganti gambar sampel produk dengan hasil visualisasi AI di posisi frame/papan yang sama.
 
 ---
 
@@ -81,12 +83,12 @@ export const dummyProductDetail = {
 
 ### Pembagian Tanggung Jawab
 
-| Lapisan | Tanggung Jawab | Batasan |
-| --- | --- | --- |
-| Domain | Model produk, varian, aturan kustomisasi, dan kontrak repository produk serta AI Try On. | Tidak bergantung pada React, HTTP, `FormData`, atau lapisan luar. |
-| Application | Use case `getProductDetail` dan `generateTryOn`; validasi input berdasarkan aturan domain dan koordinasi repository. | Hanya bergantung pada domain; repository diterima melalui parameter, bukan mengimpor implementasi infrastructure. |
-| Infrastructure | Implementasi repository untuk mock produk dan API AI; pembuatan `FormData`, HTTP POST, validasi response, dan pemetaan `generated_image_url` menjadi URL hasil use case. | Mengimplementasikan kontrak domain; tidak mengatur state atau rendering React. |
-| Presentation | Halaman, komponen, dan hook React; state `selectedVariant`, `methodType`, `generatedResultUrl`, `isLoading`, serta pesan error dan transisi preview. | Memanggil use case; tidak melakukan request HTTP atau membuat `FormData` langsung. |
+| Lapisan        | Tanggung Jawab                                                                                                                                                           | Batasan                                                                                                           |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| Domain         | Model produk, varian, aturan kustomisasi, dan kontrak repository produk serta AI Try On.                                                                                 | Tidak bergantung pada React, HTTP, `FormData`, atau lapisan luar.                                                 |
+| Application    | Use case `getProductDetail` dan `generateTryOn`; validasi input berdasarkan aturan domain dan koordinasi repository.                                                     | Hanya bergantung pada domain; repository diterima melalui parameter, bukan mengimpor implementasi infrastructure. |
+| Infrastructure | Implementasi repository untuk mock produk dan API AI; pembuatan `FormData`, HTTP POST, validasi response, dan pemetaan `generated_image_url` menjadi URL hasil use case. | Mengimplementasikan kontrak domain; tidak mengatur state atau rendering React.                                    |
+| Presentation   | Halaman, komponen, dan hook React; state `selectedVariant`, `methodType`, `generatedResultUrl`, `isLoading`, serta pesan error dan transisi preview.                     | Memanggil use case; tidak melakukan request HTTP atau membuat `FormData` langsung.                                |
 
 ### Struktur Folder
 
@@ -115,4 +117,3 @@ src/
 - Uji aturan domain dan use case dengan repository palsu tanpa React atau jaringan.
 - Uji repository API untuk payload `FormData`, pemetaan response sukses, dan response gagal.
 - Uji presentation untuk varian awal P1, perubahan kedua preview saat memilih varian, reset hasil AI, serta state loading, sukses, dan error.
-

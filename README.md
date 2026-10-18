@@ -23,25 +23,25 @@ npm run preview
 
 ## Halaman
 
-| URL | Isi |
-| --- | --- |
-| `/` | Home, layanan, About Us, daftar produk, dan tautan ke Shop/Detail. |
-| `/shop` | 21 pilihan warna mock, pencarian, filter warna, urutan nama, dan pagination. |
-| `/products/prod-001` | Produk utama, varian P1-P8, keranjang, dan form/upload Try On. |
-| `/products/:id` | Detail warna yang dipilih dari katalog; P1 mengikuti produk tersebut. |
+| URL                  | Isi                                                                          |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `/`                  | Home, layanan, About Us, daftar produk, dan tautan ke Shop/Detail.           |
+| `/shop`              | 21 pilihan warna mock, pencarian, filter warna, urutan nama, dan pagination. |
+| `/products/prod-001` | Produk utama, varian P1-P8, keranjang, dan form/upload Try On.               |
+| `/products/:id`      | Detail warna yang dipilih dari katalog; P1 mengikuti produk tersebut.        |
 
 Harga Rp120.000 berasal dari mock pada spesifikasi, bukan harga katalog produksi. Jumlah produk dihitung dari data mock dan aset yang tersedia. Keranjang hanya tersimpan selama sesi halaman; reload mengosongkannya. Tidak ada pembayaran, pemesanan ke server, atau penyimpanan data personal.
 
 ## Clean Architecture
 
-| Folder | Tanggung jawab |
-| --- | --- |
-| `src/domain/` | Aturan kustomisasi dan kontrak operasi repository. |
-| `src/application/` | Use case katalog, detail produk, dan generate Try On dengan repository yang diinjeksi. |
-| `src/infrastructure/` | Repository mock dan request API, FormData, serta validasi response. |
-| `src/presentation/` | Halaman, komponen, context UI, dan hook React. |
-| `src/app/` | Composition root, perakitan repository/use case, routing, dan state keranjang. |
-| `src/data/products.js` | Data contoh, hanya diimpor repository mock. |
+| Folder                 | Tanggung jawab                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| `src/domain/`          | Aturan kustomisasi dan kontrak operasi repository.                                     |
+| `src/application/`     | Use case katalog, detail produk, dan generate Try On dengan repository yang diinjeksi. |
+| `src/infrastructure/`  | Repository mock dan request API, FormData, serta validasi response.                    |
+| `src/presentation/`    | Halaman, komponen, context UI, dan hook React.                                         |
+| `src/app/`             | Composition root, perakitan repository/use case, routing, dan state keranjang.         |
+| `src/data/products.js` | Data contoh, hanya diimpor repository mock.                                            |
 
 Application bergantung pada Domain. Presentation menerima use case lewat context; tidak mengimpor Infrastructure atau composition root. Infrastructure mengimplementasikan kontrak domain melalui operasi fungsi JavaScript. Tidak ada base class atau dependency injection framework.
 
@@ -53,13 +53,13 @@ Frontend tidak menyertakan backend AI. Endpoint sementara adalah `/api/try-on`. 
 
 Kontrak sementara yang digunakan frontend, karena URL endpoint dan nama field media belum ditetapkan dalam spesifikasi backend:
 
-| Field FormData | Nilai |
-| --- | --- |
-| `base_image_url` | URL absolut WebP dari varian yang dipilih. |
-| `variant_code` | P1-P8. |
-| `method_type` | FORM atau IMAGE_UPLOAD. |
-| `ucapan_selamat`, `tambahan`, `pesan`, `kepada`, `dari`, `atribut`, `posisi` | Dikirim hanya untuk FORM. |
-| `overlay_image` | File lokal, dikirim hanya untuk IMAGE_UPLOAD. |
+| Field FormData                                                               | Nilai                                         |
+| ---------------------------------------------------------------------------- | --------------------------------------------- |
+| `base_image_url`                                                             | URL absolut WebP dari varian yang dipilih.    |
+| `variant_code`                                                               | P1-P8.                                        |
+| `method_type`                                                                | FORM atau IMAGE_UPLOAD.                       |
+| `ucapan_selamat`, `tambahan`, `pesan`, `kepada`, `dari`, `atribut`, `posisi` | Dikirim hanya untuk FORM.                     |
+| `overlay_image`                                                              | File lokal, dikirim hanya untuk IMAGE_UPLOAD. |
 
 Response sukses:
 
@@ -125,28 +125,28 @@ Verifikasi implementasi awal pada 15 Oktober 2026, sebelum revisi katalog deskto
 
 ### Click-Through
 
-| Kontrol | Hasil yang diperiksa |
-| --- | --- |
-| Home, Shop, Services, Best Seller, About Us | Navigasi ke halaman/section yang ada. |
-| Shop Now hero, CTA bawah, Lihat semua, link koleksi | Membuka Shop atau Detail sesuai action. |
-| Birthday, Wedding, Greeting Card, Baby Born, Flower Bouquet | Membuka Shop. Katalog saat ini hanya papan akrilik mock, bukan inventori tiap layanan. |
-| Link footer dan breadcrumb Shop | Navigasi ke halaman/section nyata. |
-| Search header dan pencarian Shop | Hasil Ungu Putih, empty state untuk pencarian yang tidak cocok, lalu reset dengan Hapus filter. |
-| Filter warna, nama A-Z/Z-A | Filter Peach serta urutan Biru Krem/Ungu Putih yang sesuai. |
-| Pagination 2, berikutnya, sebelumnya | Halaman kedua 9 produk, halaman terakhir 3 produk, kembali ke halaman kedua. |
-| Kartu katalog | Detail dibuka dengan warna produk yang tepat. |
-| P1-P8 dan empat thumbnail galeri | Kedua preview sinkron, default P1. |
-| Pesan Sekarang, tambah, kurang, hapus | Dialog terbuka, kuantitas 1-2-1, item hilang dan empty state muncul. |
-| Escape pada dialog | Menutup modal, termasuk setelah tombol item yang terfokus dihapus. |
-| Menu mobile | Buka dan tutup dengan Escape. |
-| Tab dari skip link | Berpindah ke logo dengan outline solid 3 px. |
-| Generate, form kosong | Native validation menolak field wajib kosong. |
-| Generate, API simulasi sukses | POST multipart, spinner, tombol disabled, lalu generated_image_url ditampilkan. |
-| Ganti varian setelah hasil | Hasil dikosongkan, preview kembali ke sampel varian baru. |
-| Pilih file lokal | Metode otomatis IMAGE_UPLOAD; POST hanya membawa file overlay dan field dasar. |
-| Ubah input form setelah metode upload | Metode otomatis FORM. |
-| HTTP 500 dan endpoint belum tersedia | Error terlihat dan loading berakhir; tidak ada hasil palsu. |
-| Upload non-gambar | Ditolak sebelum request. |
+| Kontrol                                                     | Hasil yang diperiksa                                                                            |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Home, Shop, Services, Best Seller, About Us                 | Navigasi ke halaman/section yang ada.                                                           |
+| Shop Now hero, CTA bawah, Lihat semua, link koleksi         | Membuka Shop atau Detail sesuai action.                                                         |
+| Birthday, Wedding, Greeting Card, Baby Born, Flower Bouquet | Membuka Shop. Katalog saat ini hanya papan akrilik mock, bukan inventori tiap layanan.          |
+| Link footer dan breadcrumb Shop                             | Navigasi ke halaman/section nyata.                                                              |
+| Search header dan pencarian Shop                            | Hasil Ungu Putih, empty state untuk pencarian yang tidak cocok, lalu reset dengan Hapus filter. |
+| Filter warna, nama A-Z/Z-A                                  | Filter Peach serta urutan Biru Krem/Ungu Putih yang sesuai.                                     |
+| Pagination 2, berikutnya, sebelumnya                        | Halaman kedua 9 produk, halaman terakhir 3 produk, kembali ke halaman kedua.                    |
+| Kartu katalog                                               | Detail dibuka dengan warna produk yang tepat.                                                   |
+| P1-P8 dan empat thumbnail galeri                            | Kedua preview sinkron, default P1.                                                              |
+| Pesan Sekarang, tambah, kurang, hapus                       | Dialog terbuka, kuantitas 1-2-1, item hilang dan empty state muncul.                            |
+| Escape pada dialog                                          | Menutup modal, termasuk setelah tombol item yang terfokus dihapus.                              |
+| Menu mobile                                                 | Buka dan tutup dengan Escape.                                                                   |
+| Tab dari skip link                                          | Berpindah ke logo dengan outline solid 3 px.                                                    |
+| Generate, form kosong                                       | Native validation menolak field wajib kosong.                                                   |
+| Generate, API simulasi sukses                               | POST multipart, spinner, tombol disabled, lalu generated_image_url ditampilkan.                 |
+| Ganti varian setelah hasil                                  | Hasil dikosongkan, preview kembali ke sampel varian baru.                                       |
+| Pilih file lokal                                            | Metode otomatis IMAGE_UPLOAD; POST hanya membawa file overlay dan field dasar.                  |
+| Ubah input form setelah metode upload                       | Metode otomatis FORM.                                                                           |
+| HTTP 500 dan endpoint belum tersedia                        | Error terlihat dan loading berakhir; tidak ada hasil palsu.                                     |
+| Upload non-gambar                                           | Ditolak sebelum request.                                                                        |
 
 ### Delivery Gate Frontend
 

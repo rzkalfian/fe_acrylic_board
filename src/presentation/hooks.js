@@ -119,3 +119,25 @@ export function useTryOn(product) {
     generate,
   };
 }
+
+export function useOrderTypes(productId) {
+  const { useCases } = useApp();
+  const [state, setState] = useState({ types: null, loading: true, error: "" });
+  const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    let active = true;
+    setState({ types: null, loading: true, error: "" });
+    useCases
+      .getOrderTypes(productId)
+      .then((types) => active && setState({ types, loading: false, error: "" }))
+      .catch(
+        (failure) =>
+          active &&
+          setState({ types: null, loading: false, error: failure.message }),
+      );
+    return () => {
+      active = false;
+    };
+  }, [productId, revision, useCases]);
+  return { ...state, retry: () => setRevision((value) => value + 1) };
+}

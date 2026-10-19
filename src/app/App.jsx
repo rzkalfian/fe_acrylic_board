@@ -4,6 +4,7 @@ import { createUseCases } from "../application/useCases.js";
 import {
   productRepository,
   createTryOnRepository,
+  createOrderRepository,
 } from "../infrastructure/repositories.js";
 import {
   Header,
@@ -18,6 +19,7 @@ import { AppContext } from "../presentation/context.jsx";
 const useCases = createUseCases(
   productRepository,
   createTryOnRepository(import.meta.env.VITE_AI_GENERATE_URL || "/api/try-on"),
+  createOrderRepository(import.meta.env.VITE_API_URL || "/api"),
 );
 
 export function App() {

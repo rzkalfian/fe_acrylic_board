@@ -172,3 +172,59 @@ test("pesan WhatsApp memuat isi try on, hasil gambar, dan data pemesan", async (
     assert.ok(text.includes(part), part);
   assert.ok(!text.includes("Catatan"));
 });
+
+test("pesanan: jenis hanya yang berharga, tulisan wajib punya hasil try on, sewa wajib tanggal", async () => {
+  const { createOrderRepository } =
+    await import("../src/infrastructure/repositories.js");
+  const placed = [];
+  const repo = createOrderRepository("/api", async (url, options) => {
+    if (url === "/api/products")
+      return Response.json([
+        {
+          id: "a",
+          price_beli_papan: 90000,
+          price_beli_tulisan: 120000,
+          price_sewa_tulisan: null,
+        },
+      ]);
+    placed.push(JSON.parse(options.body));
+    return Response.json({ id: "o1" }, { status: 201 });
+  });
+  const useCases = createUseCases(productRepository, {}, repo);
+  const types = await useCases.getOrderTypes("a");
+  assert.deepEqual(
+    types.map((t) => t.value),
+    ["beli_papan", "beli_tulisan"],
+  );
+  assert.deepEqual(await useCases.getOrderTypes("missing"), []);
+
+  const customer = { name: " Ani ", phone: "0812", address: "Jl. A" };
+  const base = {
+    productId: "a",
+    variant: { code: "P1" },
+    quantity: 2,
+    customer,
+  };
+  await assert.rejects(
+    useCases.placeOrder({ ...base, type: types[1] }),
+    /Try On/,
+  );
+  const rent = { value: "sewa_tulisan", needsText: true, rent: true };
+  await assert.rejects(
+    useCases.placeOrder({ ...base, type: rent, resultUrl: "https://x/r.webp" }),
+    /tanggal/,
+  );
+  await useCases.placeOrder({ ...base, type: types[0] });
+  assert.equal(placed[0].order_type, "beli_papan");
+  assert.equal(placed[0].customer_name, "Ani");
+  assert.equal(placed[0].generated_image_url, undefined);
+});
+
+test("repository pesanan meneruskan pesan error dari backend", async () => {
+  const { createOrderRepository } =
+    await import("../src/infrastructure/repositories.js");
+  const repo = createOrderRepository("/api", async () =>
+    Response.json({ error: "Tanggal sewa tidak valid." }, { status: 400 }),
+  );
+  await assert.rejects(repo.place({}), /Tanggal sewa tidak valid/);
+});

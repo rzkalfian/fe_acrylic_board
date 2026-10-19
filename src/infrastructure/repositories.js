@@ -9,6 +9,37 @@ export const productRepository = {
   },
 };
 
+export function createOrderRepository(apiBase, request = fetch) {
+  return {
+    // null = produk belum ada di backend, jadi belum bisa dipesan.
+    async getProduct(id) {
+      const response = await request(`${apiBase}/products`);
+      if (!response.ok) throw new Error("Harga produk belum berhasil dimuat.");
+      const products = await response.json();
+      return products.find((product) => product.id === id) ?? null;
+    },
+    async place(order) {
+      const response = await request(`${apiBase}/orders`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(order),
+      });
+      if (response.status === 400 || response.status === 404) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || "Data pesanan belum sesuai.");
+      }
+      if (response.status === 429)
+        throw new Error("Terlalu banyak percobaan. Coba lagi sebentar.");
+      if (!response.ok)
+        throw new Error("Pesanan belum berhasil dikirim. Silakan coba lagi.");
+      const result = await response.json();
+      if (typeof result.id !== "string")
+        throw new Error("Pesanan belum berhasil dikirim. Silakan coba lagi.");
+      return result.id;
+    },
+  };
+}
+
 export function createTryOnRepository(endpoint, request = fetch) {
   return {
     async generate({ variant, methodType, fields, file }, signal) {

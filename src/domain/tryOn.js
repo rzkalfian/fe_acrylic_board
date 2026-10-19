@@ -62,23 +62,9 @@ export function validateCustomization({ methodType, fields, file, variant }) {
 }
 const labelOf = (options, value) => options.find(([key]) => key === value)?.[1];
 
-export function buildOrderMessage({
-  product,
-  variant,
-  fields,
-  resultUrl,
-  customer,
-  formatPrice,
-}) {
-  const quantity = Number(customer.quantity);
-  const lines = [
-    "Halo Dipi Floriest, saya ingin memesan papan akrilik sesuai hasil Try On:",
-    "",
-    `Produk: ${product.name} (${variant.code} - ${variant.label})`,
-    `Harga: ${formatPrice(product.price)} x ${quantity} = ${formatPrice(product.price * quantity)}`,
-    "",
-    "Isi papan:",
-  ];
+// Baris isi papan (ucapan, pesan, nama, gaya); dipakai pesan WhatsApp dan catatan pesanan di admin.
+export function boardLines(fields) {
+  const lines = [];
   for (const [name, title] of [
     ["ucapan_selamat", "Ucapan"],
     ["tambahan", "Tambahan"],
@@ -105,9 +91,35 @@ export function buildOrderMessage({
   }
   if (fields.atribut) lines.push(`Atribut: ${fields.atribut}`);
   if (fields.posisi) lines.push(`Posisi: ${fields.posisi}`);
-  lines.push(
+  return lines;
+}
+
+export function buildOrderMessage({
+  product,
+  variant,
+  fields,
+  resultUrl,
+  customer,
+  formatPrice,
+  orderType,
+  unitPrice = product.price,
+}) {
+  const quantity = Number(customer.quantity);
+  const lines = [
+    "Halo Dipi Floriest, saya ingin memesan papan akrilik:",
     "",
-    `Hasil Try On: ${resultUrl}`,
+    `Produk: ${product.name} (${variant.code} - ${variant.label})`,
+  ];
+  if (orderType) lines.push(`Jenis: ${orderType.label}`);
+  lines.push(
+    `Harga: ${formatPrice(unitPrice)} x ${quantity} = ${formatPrice(unitPrice * quantity)}`,
+  );
+  if (!orderType || orderType.needsText)
+    lines.push("", "Isi papan:", ...boardLines(fields));
+  if (customer.rentStart)
+    lines.push("", `Sewa: ${customer.rentStart} sampai ${customer.rentEnd}`);
+  if (resultUrl) lines.push("", `Hasil Try On: ${resultUrl}`);
+  lines.push(
     "",
     `Nama: ${customer.name.trim()}`,
     `WhatsApp: ${customer.phone.trim()}`,

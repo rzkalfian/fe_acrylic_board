@@ -2218,3 +2218,29 @@ textarea::placeholder {
     grid-template-columns: 1fr;
   }
 }
+
+.order-types {
+  border: 0;
+  padding: 0;
+  margin: 0 0 16px;
+  display: grid;
+  gap: 8px;
+}
+.order-types legend {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.order-type {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+}
+.order-type:has(input:checked) {
+  background: var(--color-soft-pink);
+  border-color: var(--action);
+}

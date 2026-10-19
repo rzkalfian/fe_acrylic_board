@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { useProducts, useTryOn } from "./hooks.js";
+import { useProducts, useTryOn, useOrderTypes } from "./hooks.js";
+import { useApp } from "./context.jsx";
 import {
   formatPrice,
   ProductImage,
@@ -9,6 +10,7 @@ import {
   SolarIcon,
 } from "./components.jsx";
 import {
+  boardLines,
   buildOrderMessage,
   fontOptions,
   sizeOptions,
@@ -20,49 +22,250 @@ const shopWhatsapp = (import.meta.env.VITE_SHOP_WHATSAPP || "").replace(
   "",
 );
 
-function OrderForm({ product, variant, fields, resultUrl }) {
+function OrderForm({ product, variant, fields, resultUrl, options }) {
+  const [typeValue, setTypeValue] = useState("");
   const [customer, setCustomer] = useState({
     name: "",
     phone: "",
     address: "",
     quantity: 1,
     note: "",
+    rentStart: "",
+    rentEnd: "",
   });
-  const [error, setError] = useState("");
+  const [status, setStatus] = useState({ busy: false, error: "", done: null });
+  const { useCases } = useApp();
+  const types = options.types ?? [];
+  const type = types.find((item) => item.value === typeValue) ?? types[0];
   const set = (name) => (event) =>
     setCustomer((current) => ({ ...current, [name]: event.target.value }));
-  const total = product.price * (Number(customer.quantity) || 0);
+  const total = (type?.price ?? 0) * (Number(customer.quantity) || 0);
+  const needsResult = Boolean(type?.needsText && !resultUrl);
+  const today = new Date().toISOString().slice(0, 10);
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault();
-    if (!shopWhatsapp)
-      return setError("Nomor WhatsApp toko belum diatur (VITE_SHOP_WHATSAPP).");
-    const message = buildOrderMessage({
-      product,
-      variant,
-      fields,
-      resultUrl: new URL(resultUrl, window.location.href).href,
-      customer,
-      formatPrice,
-    });
-    window.open(
-      `https://wa.me/${shopWhatsapp}?text=${encodeURIComponent(message)}`,
-      "_blank",
-      "noopener,noreferrer",
-    );
+    setStatus({ busy: true, error: "", done: null });
+    try {
+      const note =
+        [
+          ...(type.needsText ? boardLines(fields) : []),
+          customer.note.trim() && `Catatan: ${customer.note.trim()}`,
+        ]
+          .filter(Boolean)
+          .join("\n") || undefined;
+      await useCases.placeOrder({
+        productId: product.id,
+        variant,
+        type,
+        quantity: customer.quantity,
+        customer,
+        note,
+        resultUrl,
+      });
+      const message = buildOrderMessage({
+        product,
+        variant,
+        fields,
+        resultUrl: resultUrl && new URL(resultUrl, window.location.href).href,
+        customer: type.rent ? customer : { ...customer, rentStart: "" },
+        formatPrice,
+        orderType: type,
+        unitPrice: type.price,
+      });
+      setStatus({ busy: false, error: "", done: { message } });
+    } catch (failure) {
+      setStatus({
+        busy: false,
+        done: null,
+        error:
+          failure instanceof TypeError
+            ? "Server pesanan tidak dapat dihubungi. Silakan coba lagi."
+            : failure.message,
+      });
+    }
   }
+
+  let body;
+  if (options.loading) body = <p role="status">Memuat pilihan harga...</p>;
+  else if (options.error)
+    body = (
+      <p className="form-error" role="alert">
+        <SolarIcon name="danger-circle" /> {options.error}{" "}
+        <button type="button" className="text-link" onClick={options.retry}>
+          Coba lagi
+        </button>
+      </p>
+    );
+  else if (!types.length)
+    body = (
+      <p>
+        Produk ini belum bisa dipesan online. Hubungi kami lewat WhatsApp untuk
+        pemesanan.
+      </p>
+    );
+  else if (status.done)
+    body = (
+      <div role="status">
+        <h3>Pesanan Anda sudah tercatat</h3>
+        <p>
+          Kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi dan
+          pembayaran.
+        </p>
+        {shopWhatsapp && (
+          <a
+            className="button"
+            href={`https://wa.me/${shopWhatsapp}?text=${encodeURIComponent(status.done.message)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <SolarIcon name="bag-4" /> Kirim detail lewat WhatsApp
+          </a>
+        )}
+      </div>
+    );
+  else
+    body = (
+      <form className="try-on-form order-form" onSubmit={submit}>
+        <fieldset className="order-types">
+          <legend>Jenis Pesanan</legend>
+          {types.map((item) => (
+            <label className="order-type" key={item.value}>
+              <input
+                type="radio"
+                name="order_type"
+                checked={item.value === type.value}
+                onChange={() => setTypeValue(item.value)}
+              />
+              <span>
+                {item.label} · <strong>{formatPrice(item.price)}</strong>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+        {needsResult && (
+          <p className="form-error" role="alert">
+            <SolarIcon name="danger-circle" /> Jenis ini memakai tulisan.{" "}
+            <a href="#try-on">Buat gambar Try On</a> dulu agar tulisan Anda
+            tercatat.
+          </p>
+        )}
+        <div className="form-fields">
+          <label>
+            Nama Lengkap
+            <abbr className="required" title="wajib diisi">
+              {" "}
+              *
+            </abbr>
+            <input
+              required
+              maxLength="120"
+              autoComplete="name"
+              value={customer.name}
+              onChange={set("name")}
+            />
+          </label>
+          <label>
+            Nomor WhatsApp
+            <abbr className="required" title="wajib diisi">
+              {" "}
+              *
+            </abbr>
+            <input
+              required
+              type="tel"
+              maxLength="20"
+              autoComplete="tel"
+              value={customer.phone}
+              onChange={set("phone")}
+            />
+          </label>
+          <label className="full-width">
+            Alamat Pengiriman
+            <abbr className="required" title="wajib diisi">
+              {" "}
+              *
+            </abbr>
+            <textarea
+              required
+              rows="2"
+              maxLength="300"
+              autoComplete="street-address"
+              value={customer.address}
+              onChange={set("address")}
+            />
+          </label>
+          {type.rent && (
+            <>
+              <label>
+                Mulai Sewa
+                <input
+                  required
+                  type="date"
+                  min={today}
+                  value={customer.rentStart}
+                  onChange={set("rentStart")}
+                />
+              </label>
+              <label>
+                Selesai Sewa
+                <input
+                  required
+                  type="date"
+                  min={customer.rentStart || today}
+                  value={customer.rentEnd}
+                  onChange={set("rentEnd")}
+                />
+              </label>
+            </>
+          )}
+          <label>
+            Jumlah
+            <input
+              type="number"
+              min="1"
+              max="99"
+              required
+              value={customer.quantity}
+              onChange={set("quantity")}
+            />
+          </label>
+          <label>
+            Catatan (Opsional)
+            <input
+              maxLength="200"
+              value={customer.note}
+              onChange={set("note")}
+            />
+          </label>
+        </div>
+        {status.error && (
+          <p className="form-error" role="alert">
+            <SolarIcon name="danger-circle" /> {status.error}
+          </p>
+        )}
+        <button
+          type="submit"
+          className="button button-wide"
+          disabled={status.busy || needsResult}
+        >
+          <SolarIcon name="bag-4" />{" "}
+          {status.busy ? "Mengirim pesanan..." : "Kirim Pesanan"}
+        </button>
+      </form>
+    );
 
   return (
     <section className="order-section" id="order" aria-labelledby="order-title">
       <h2 id="order-title">
-        <strong>PESAN</strong> SESUAI TRY ON
+        <strong>PESAN</strong> SEKARANG
       </h2>
       <div className="order-grid">
         <div className="order-summary">
           <ProductImage
-            key={resultUrl}
-            src={resultUrl}
-            alt="Hasil Try On yang dipesan"
+            key={resultUrl || variant.imageUrl}
+            src={resultUrl || variant.imageUrl}
+            alt={resultUrl ? "Hasil Try On yang dipesan" : "Papan yang dipesan"}
             width="320"
             height="320"
           />
@@ -71,88 +274,13 @@ function OrderForm({ product, variant, fields, resultUrl }) {
             <br />
             {variant.code} · {variant.label}
           </p>
-          <strong>{formatPrice(total)}</strong>
+          {type && <strong>{formatPrice(total)}</strong>}
         </div>
-        <form className="try-on-form order-form" onSubmit={submit}>
-          <div className="form-fields">
-            <label>
-              Nama Lengkap
-              <abbr className="required" title="wajib diisi">
-                {" "}
-                *
-              </abbr>
-              <input
-                required
-                maxLength="120"
-                autoComplete="name"
-                value={customer.name}
-                onChange={set("name")}
-              />
-            </label>
-            <label>
-              Nomor WhatsApp
-              <abbr className="required" title="wajib diisi">
-                {" "}
-                *
-              </abbr>
-              <input
-                required
-                type="tel"
-                maxLength="20"
-                autoComplete="tel"
-                value={customer.phone}
-                onChange={set("phone")}
-              />
-            </label>
-            <label className="full-width">
-              Alamat Pengiriman
-              <abbr className="required" title="wajib diisi">
-                {" "}
-                *
-              </abbr>
-              <textarea
-                required
-                rows="2"
-                maxLength="300"
-                autoComplete="street-address"
-                value={customer.address}
-                onChange={set("address")}
-              />
-            </label>
-            <label>
-              Jumlah
-              <input
-                type="number"
-                min="1"
-                max="99"
-                required
-                value={customer.quantity}
-                onChange={set("quantity")}
-              />
-            </label>
-            <label>
-              Catatan (Opsional)
-              <input
-                maxLength="200"
-                value={customer.note}
-                onChange={set("note")}
-              />
-            </label>
-          </div>
-          {error && (
-            <p className="form-error" role="alert">
-              <SolarIcon name="danger-circle" /> {error}
-            </p>
-          )}
-          <button type="submit" className="button button-wide">
-            <SolarIcon name="bag-4" /> Pesan via WhatsApp
-          </button>
-        </form>
+        {body}
       </div>
     </section>
   );
 }
-
 function FieldTools({ name, label, fields, updateField }) {
   const controls = [
     ["font", "Font", fontOptions],
@@ -206,6 +334,10 @@ export function DetailPage() {
 
 function ProductDetail({ product }) {
   const tryOn = useTryOn(product);
+  const options = useOrderTypes(product.id);
+  const lowestPrice = options.types?.length
+    ? Math.min(...options.types.map((type) => type.price))
+    : null;
   const {
     selectedVariant,
     selectVariant,
@@ -266,7 +398,11 @@ function ProductDetail({ product }) {
             <h1>
               Papan Akrilik Greeting<span>Warna {product.color}</span>
             </h1>
-            <p className="product-price">{formatPrice(product.price)}</p>
+            <p className="product-price">
+              {lowestPrice === null
+                ? formatPrice(product.price)
+                : `Mulai ${formatPrice(lowestPrice)}`}
+            </p>
             <p className="product-description">{product.description}</p>
             <div className="variant-list">
               {product.variants.map((variant) => (
@@ -293,10 +429,7 @@ function ProductDetail({ product }) {
               ))}
             </div>
             <div className="product-actions">
-              <a
-                className="button"
-                href={generatedResultUrl ? "#order" : "#try-on"}
-              >
+              <a className="button" href="#order">
                 <SolarIcon name="bag-4" /> Pesan Sekarang
               </a>
             </div>
@@ -550,14 +683,13 @@ function ProductDetail({ product }) {
             </form>
           </div>
         </section>
-        {generatedResultUrl && (
-          <OrderForm
-            product={product}
-            variant={selectedVariant}
-            fields={fields}
-            resultUrl={generatedResultUrl}
-          />
-        )}
+        <OrderForm
+          product={product}
+          variant={selectedVariant}
+          fields={fields}
+          resultUrl={generatedResultUrl}
+          options={options}
+        />
       </div>
     </div>
   );

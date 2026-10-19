@@ -1,5 +1,5 @@
 import { validateCustomization } from "../domain/tryOn.js";
-import { availableTypes, validateOrder } from "../domain/order.js";
+import { availableTypes, indexPrices, validateOrder } from "../domain/order.js";
 
 export function createUseCases(
   productRepository,
@@ -16,6 +16,9 @@ export function createUseCases(
     async getOrderTypes(productId) {
       const product = await orderRepository.getProduct(productId);
       return product ? availableTypes(product) : [];
+    },
+    async getCatalogPrices() {
+      return indexPrices(await orderRepository.listProducts());
     },
     async placeOrder({
       productId,

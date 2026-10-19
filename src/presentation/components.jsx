@@ -317,7 +317,7 @@ export function ProductImage({ src, alt, className = "", ...props }) {
   );
 }
 
-export function ProductCard({ product }) {
+export function ProductCard({ product, priceText }) {
   return (
     <article className="product-card">
       <Link
@@ -341,7 +341,7 @@ export function ProductCard({ product }) {
         <h3>
           <Link to={`/products/${product.id}`}>{product.color}</Link>
         </h3>
-        <p>{formatPrice(product.price)}</p>
+        <p>{priceText ?? formatPrice(product.price)}</p>
       </div>
     </article>
   );

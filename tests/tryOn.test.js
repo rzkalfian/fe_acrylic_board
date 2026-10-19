@@ -228,3 +228,28 @@ test("repository pesanan meneruskan pesan error dari backend", async () => {
   );
   await assert.rejects(repo.place({}), /Tanggal sewa tidak valid/);
 });
+
+test("indeks harga katalog: jenis yang dijual dan harga terendah per produk", async () => {
+  const { indexPrices } = await import("../src/domain/order.js");
+  const index = indexPrices([
+    {
+      id: "a",
+      price_beli_papan: 90000,
+      price_beli_tulisan: 120000,
+      price_sewa_tulisan: 250000,
+    },
+    {
+      id: "b",
+      price_beli_papan: null,
+      price_beli_tulisan: null,
+      price_sewa_tulisan: null,
+    },
+  ]);
+  assert.equal(index.get("a").from, 90000);
+  assert.deepEqual(
+    index.get("a").types.map((t) => t.value),
+    ["beli_papan", "beli_tulisan", "sewa_tulisan"],
+  );
+  assert.equal(index.get("b").from, null);
+  assert.deepEqual(index.get("b").types, []);
+});

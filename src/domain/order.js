@@ -31,3 +31,19 @@ export function validateOrder({ type, resultUrl, customer }) {
       throw new Error("Tanggal selesai sewa harus setelah tanggal mulai.");
   }
 }
+
+// id produk -> { types, from }; `from` adalah harga terendah dari jenis yang dijual.
+export function indexPrices(products) {
+  return new Map(
+    products.map((product) => {
+      const types = availableTypes(product);
+      return [
+        product.id,
+        {
+          types,
+          from: types.length ? Math.min(...types.map((t) => t.price)) : null,
+        },
+      ];
+    }),
+  );
+}

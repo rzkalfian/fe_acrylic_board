@@ -148,3 +148,20 @@ export function useOrderTypes(productId) {
   }, [productId, revision, useCases]);
   return { ...state, retry: () => setRevision((value) => value + 1) };
 }
+
+// Gagal memuat harga tidak menghalangi katalog; `prices` tetap null dan kartu memakai harga contoh.
+export function useCatalogPrices() {
+  const { useCases } = useApp();
+  const [state, setState] = useState({ prices: null, error: false });
+  useEffect(() => {
+    let active = true;
+    useCases
+      .getCatalogPrices()
+      .then((prices) => active && setState({ prices, error: false }))
+      .catch(() => active && setState({ prices: null, error: true }));
+    return () => {
+      active = false;
+    };
+  }, [useCases]);
+  return state;
+}

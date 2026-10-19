@@ -133,7 +133,14 @@ export function useOrderTypes(productId) {
       .catch(
         (failure) =>
           active &&
-          setState({ types: null, loading: false, error: failure.message }),
+          setState({
+            types: null,
+            loading: false,
+            error:
+              failure instanceof TypeError
+                ? "Server harga tidak dapat dihubungi. Silakan coba lagi."
+                : failure.message,
+          }),
       );
     return () => {
       active = false;

@@ -1,23 +1,12 @@
 import { useDeferredValue } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  formatPrice,
   ProductCard,
   ResourceState,
   SelectWrap,
   SolarIcon,
 } from "./components.jsx";
-import { useCatalogPrices, useProducts } from "./hooks.js";
-import { orderTypes } from "../domain/order.js";
-
-// undefined = pakai harga contoh (harga server gagal dimuat); string kosong = masih memuat.
-function priceText({ prices, error }, product, typeValue) {
-  if (!prices) return error ? undefined : "\u00a0";
-  const entry = prices.get(product.id);
-  if (!entry?.from) return "Belum dijual online";
-  const type = typeValue && entry.types.find((t) => t.value === typeValue);
-  return type ? formatPrice(type.price) : `Mulai ${formatPrice(entry.from)}`;
-}
+import { useProducts } from "./hooks.js";
 
 const services = [
   ["Baby Bloom", "service-baby.png"],
@@ -56,7 +45,6 @@ const steps = [
 
 export function HomePage() {
   const resource = useProducts();
-  const catalog = useCatalogPrices();
   return (
     <div className="catalog-page home-page">
       <section className="home-hero">
@@ -173,20 +161,14 @@ export function HomePage() {
           {resource.data?.length > 0 && (
             <div className="product-grid">
               {resource.data.slice(0, 6).map((product) => (
-                <ProductCard
-                  product={product}
-                  priceText={priceText(catalog, product)}
-                  key={product.id}
-                />
+                <ProductCard product={product} key={product.id} />
               ))}
             </div>
           )}
           <div className="catalog-foot">
-            {catalog.error && (
-              <p className="catalog-notice">
-                Harga terbaru belum dapat dimuat, menampilkan harga contoh.
-              </p>
-            )}
+            <p className="catalog-notice">
+              Katalog contoh · Harga mengacu pada data mock.
+            </p>
             <Link to="/shop" className="text-link">
               Lihat Selengkapnya <SolarIcon name="arrow-right" />
             </Link>
@@ -243,20 +225,15 @@ function ProductImageAbout() {
 
 export function ShopPage() {
   const resource = useProducts();
-  const catalog = useCatalogPrices();
   const [params, setParams] = useSearchParams();
   const query = params.get("q") ?? "";
   const deferredQuery = useDeferredValue(query);
   const color = params.get("color") ?? "";
-  const type = params.get("type") ?? "";
   const sort = params.get("sort") ?? "default";
   const filtered = (resource.data ?? []).filter(
     (product) =>
       product.name.toLowerCase().includes(deferredQuery.toLowerCase()) &&
-      (!color || product.color === color) &&
-      (!type ||
-        !catalog.prices ||
-        catalog.prices.get(product.id)?.types.some((t) => t.value === type)),
+      (!color || product.color === color),
   );
   if (sort === "az")
     filtered.sort((first, second) => first.color.localeCompare(second.color));
@@ -309,18 +286,6 @@ export function ShopPage() {
             {resource.data ? `${filtered.length} produk` : "Memuat..."}
           </span>
         </div>
-        <div className="type-tabs" role="group" aria-label="Jenis pesanan">
-          {[{ value: "", label: "Semua" }, ...orderTypes].map((item) => (
-            <button
-              type="button"
-              key={item.value}
-              aria-pressed={type === item.value}
-              onClick={() => update("type", item.value)}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
         <div className="shop-filters">
           <div className="filter-search">
             <label className="sr-only" htmlFor="product-search">
@@ -367,17 +332,14 @@ export function ShopPage() {
             </SelectWrap>
           </div>
         </div>
-        {catalog.error && (
-          <p className="catalog-notice">
-            Harga terbaru belum dapat dimuat, menampilkan harga contoh.
-            {type && " Filter jenis pesanan belum bisa dipakai."}
-          </p>
-        )}
+        <p className="catalog-notice">
+          Katalog contoh · Harga mengacu pada data mock.
+        </p>
         <ResourceState {...resource} />
         {!resource.loading && !resource.error && visible.length === 0 && (
           <div className="resource-state">
             <h3>Tidak ada produk yang cocok.</h3>
-            <p>Coba warna atau jenis pesanan lain, atau hapus filter.</p>
+            <p>Coba warna lain atau hapus filter pencarian.</p>
             <button className="button" onClick={() => setParams({})}>
               Hapus filter
             </button>
@@ -385,11 +347,7 @@ export function ShopPage() {
         )}
         <div className="product-grid">
           {visible.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              priceText={priceText(catalog, product, type)}
-            />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
         {filtered.length > 9 && (

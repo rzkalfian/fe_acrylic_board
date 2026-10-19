@@ -173,7 +173,7 @@ test("pesan WhatsApp memuat isi try on, hasil gambar, dan data pemesan", async (
   assert.ok(!text.includes("Catatan"));
 });
 
-test("pesanan: jenis hanya yang berharga, tulisan wajib punya hasil try on, sewa wajib tanggal", async () => {
+test("pesanan: tiga kategori selalu tampil, tulisan wajib punya hasil try on, sewa wajib tanggal", async () => {
   const { createOrderRepository } =
     await import("../src/infrastructure/repositories.js");
   const placed = [];
@@ -191,12 +191,16 @@ test("pesanan: jenis hanya yang berharga, tulisan wajib punya hasil try on, sewa
     return Response.json({ id: "o1" }, { status: 201 });
   });
   const useCases = createUseCases(productRepository, {}, repo);
-  const types = await useCases.getOrderTypes("a");
+  const types = await useCases.getOrderCategories("a");
   assert.deepEqual(
-    types.map((t) => t.value),
-    ["beli_papan", "beli_tulisan"],
+    types.map((t) => [t.value, t.available]),
+    [
+      ["beli_papan", true],
+      ["beli_tulisan", true],
+      ["sewa_tulisan", false],
+    ],
   );
-  assert.deepEqual(await useCases.getOrderTypes("missing"), []);
+  assert.deepEqual(await useCases.getOrderCategories("missing"), []);
 
   const customer = { name: " Ani ", phone: "0812", address: "Jl. A" };
   const base = {
@@ -227,29 +231,4 @@ test("repository pesanan meneruskan pesan error dari backend", async () => {
     Response.json({ error: "Tanggal sewa tidak valid." }, { status: 400 }),
   );
   await assert.rejects(repo.place({}), /Tanggal sewa tidak valid/);
-});
-
-test("indeks harga katalog: jenis yang dijual dan harga terendah per produk", async () => {
-  const { indexPrices } = await import("../src/domain/order.js");
-  const index = indexPrices([
-    {
-      id: "a",
-      price_beli_papan: 90000,
-      price_beli_tulisan: 120000,
-      price_sewa_tulisan: 250000,
-    },
-    {
-      id: "b",
-      price_beli_papan: null,
-      price_beli_tulisan: null,
-      price_sewa_tulisan: null,
-    },
-  ]);
-  assert.equal(index.get("a").from, 90000);
-  assert.deepEqual(
-    index.get("a").types.map((t) => t.value),
-    ["beli_papan", "beli_tulisan", "sewa_tulisan"],
-  );
-  assert.equal(index.get("b").from, null);
-  assert.deepEqual(index.get("b").types, []);
 });

@@ -120,21 +120,28 @@ export function useTryOn(product) {
   };
 }
 
-export function useOrderTypes(productId) {
+export function useOrderCategories(productId) {
   const { useCases } = useApp();
-  const [state, setState] = useState({ types: null, loading: true, error: "" });
+  const [state, setState] = useState({
+    categories: null,
+    loading: true,
+    error: "",
+  });
   const [revision, setRevision] = useState(0);
   useEffect(() => {
     let active = true;
-    setState({ types: null, loading: true, error: "" });
+    setState({ categories: null, loading: true, error: "" });
     useCases
-      .getOrderTypes(productId)
-      .then((types) => active && setState({ types, loading: false, error: "" }))
+      .getOrderCategories(productId)
+      .then(
+        (categories) =>
+          active && setState({ categories, loading: false, error: "" }),
+      )
       .catch(
         (failure) =>
           active &&
           setState({
-            types: null,
+            categories: null,
             loading: false,
             error:
               failure instanceof TypeError
@@ -147,21 +154,4 @@ export function useOrderTypes(productId) {
     };
   }, [productId, revision, useCases]);
   return { ...state, retry: () => setRevision((value) => value + 1) };
-}
-
-// Gagal memuat harga tidak menghalangi katalog; `prices` tetap null dan kartu memakai harga contoh.
-export function useCatalogPrices() {
-  const { useCases } = useApp();
-  const [state, setState] = useState({ prices: null, error: false });
-  useEffect(() => {
-    let active = true;
-    useCases
-      .getCatalogPrices()
-      .then((prices) => active && setState({ prices, error: false }))
-      .catch(() => active && setState({ prices: null, error: true }));
-    return () => {
-      active = false;
-    };
-  }, [useCases]);
-  return state;
 }

@@ -13,15 +13,16 @@ export const orderTypes = [
   },
 ];
 
-// Hanya jenis yang punya harga di produk yang bisa dipilih.
-export function availableTypes(product) {
-  return orderTypes
-    .filter((type) => product[`price_${type.value}`] != null)
-    .map((type) => ({ ...type, price: product[`price_${type.value}`] }));
+// Ketiga kategori order selalu ditampilkan; yang belum punya harga di produk ditandai tidak tersedia.
+export function orderCategories(product) {
+  return orderTypes.map((type) => {
+    const price = product[`price_${type.value}`] ?? null;
+    return { ...type, price, available: price !== null };
+  });
 }
 
 export function validateOrder({ type, resultUrl, customer }) {
-  if (!type) throw new Error("Pilih jenis pesanan.");
+  if (!type) throw new Error("Pilih kategori order.");
   if (type.needsText && !resultUrl)
     throw new Error("Buat gambar Try On dulu agar tulisan Anda tercatat.");
   if (type.rent) {
@@ -30,20 +31,4 @@ export function validateOrder({ type, resultUrl, customer }) {
     if (customer.rentEnd < customer.rentStart)
       throw new Error("Tanggal selesai sewa harus setelah tanggal mulai.");
   }
-}
-
-// id produk -> { types, from }; `from` adalah harga terendah dari jenis yang dijual.
-export function indexPrices(products) {
-  return new Map(
-    products.map((product) => {
-      const types = availableTypes(product);
-      return [
-        product.id,
-        {
-          types,
-          from: types.length ? Math.min(...types.map((t) => t.price)) : null,
-        },
-      ];
-    }),
-  );
 }

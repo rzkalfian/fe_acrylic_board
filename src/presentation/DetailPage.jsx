@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
-import { useProducts, useTryOn, useOrderTypes } from "./hooks.js";
+import { useProducts, useTryOn, useOrderCategories } from "./hooks.js";
 import { useApp } from "./context.jsx";
 import {
   formatPrice,
@@ -35,8 +35,10 @@ function OrderForm({ product, variant, fields, resultUrl, options }) {
   });
   const [status, setStatus] = useState({ busy: false, error: "", done: null });
   const { useCases } = useApp();
-  const types = options.types ?? [];
-  const type = types.find((item) => item.value === typeValue) ?? types[0];
+  const categories = options.categories ?? [];
+  const type =
+    categories.find((item) => item.value === typeValue && item.available) ??
+    categories.find((item) => item.available);
   const set = (name) => (event) =>
     setCustomer((current) => ({ ...current, [name]: event.target.value }));
   const total = (type?.price ?? 0) * (Number(customer.quantity) || 0);
@@ -97,7 +99,7 @@ function OrderForm({ product, variant, fields, resultUrl, options }) {
         </button>
       </p>
     );
-  else if (!types.length)
+  else if (!type)
     body = (
       <p>
         Produk ini belum bisa dipesan online. Hubungi kami lewat WhatsApp untuk
@@ -128,24 +130,33 @@ function OrderForm({ product, variant, fields, resultUrl, options }) {
     body = (
       <form className="try-on-form order-form" onSubmit={submit}>
         <fieldset className="order-types">
-          <legend>Jenis Pesanan</legend>
-          {types.map((item) => (
-            <label className="order-type" key={item.value}>
+          <legend>Kategori Order</legend>
+          {categories.map((item) => (
+            <label
+              className={item.available ? "order-type" : "order-type disabled"}
+              key={item.value}
+            >
               <input
                 type="radio"
                 name="order_type"
+                disabled={!item.available}
                 checked={item.value === type.value}
                 onChange={() => setTypeValue(item.value)}
               />
               <span>
-                {item.label} · <strong>{formatPrice(item.price)}</strong>
+                {item.label} ·{" "}
+                {item.available ? (
+                  <strong>{formatPrice(item.price)}</strong>
+                ) : (
+                  <em>Belum tersedia</em>
+                )}
               </span>
             </label>
           ))}
         </fieldset>
         {needsResult && (
           <p className="form-error" role="alert">
-            <SolarIcon name="danger-circle" /> Jenis ini memakai tulisan.{" "}
+            <SolarIcon name="danger-circle" /> Kategori ini memakai tulisan.{" "}
             <a href="#try-on">Buat gambar Try On</a> dulu agar tulisan Anda
             tercatat.
           </p>
@@ -334,10 +345,11 @@ export function DetailPage() {
 
 function ProductDetail({ product }) {
   const tryOn = useTryOn(product);
-  const options = useOrderTypes(product.id);
-  const lowestPrice = options.types?.length
-    ? Math.min(...options.types.map((type) => type.price))
-    : null;
+  const options = useOrderCategories(product.id);
+  const prices = (options.categories ?? [])
+    .filter((category) => category.available)
+    .map((category) => category.price);
+  const lowestPrice = prices.length ? Math.min(...prices) : null;
   const {
     selectedVariant,
     selectVariant,

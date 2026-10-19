@@ -11,14 +11,11 @@ export const productRepository = {
 
 export function createOrderRepository(apiBase, request = fetch) {
   return {
-    async listProducts() {
-      const response = await request(`${apiBase}/products`);
-      if (!response.ok) throw new Error("Harga produk belum berhasil dimuat.");
-      return response.json();
-    },
     // null = produk belum ada di backend, jadi belum bisa dipesan.
     async getProduct(id) {
-      const products = await this.listProducts();
+      const response = await request(`${apiBase}/products`);
+      if (!response.ok) throw new Error("Harga produk belum berhasil dimuat.");
+      const products = await response.json();
       return products.find((product) => product.id === id) ?? null;
     },
     async place(order) {

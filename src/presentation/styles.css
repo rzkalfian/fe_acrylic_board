@@ -2245,25 +2245,7 @@ textarea::placeholder {
   border-color: var(--action);
 }
 
-.type-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.type-tabs button {
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 70%);
-  color: var(--ink);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-.type-tabs button[aria-pressed="true"] {
-  background: var(--action);
-  border-color: var(--action);
-  color: #fff;
+.order-type.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

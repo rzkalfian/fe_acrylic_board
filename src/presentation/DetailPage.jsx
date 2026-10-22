@@ -1,5 +1,5 @@
-import { Link, useParams } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { useProducts, useTryOn, useOrderCategories } from "./hooks.js";
 import { useApp } from "./context.jsx";
 import {
@@ -22,6 +22,54 @@ const shopWhatsapp = (import.meta.env.VITE_SHOP_WHATSAPP || "").replace(
   "",
 );
 
+function DoneDialog({ message, onHome }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!ref.current.open) ref.current.showModal();
+  }, []);
+  return (
+    <dialog
+      ref={ref}
+      className="cart-dialog done-dialog"
+      aria-labelledby="done-title"
+      onCancel={onHome}
+    >
+      <span className="done-icon">
+        <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true">
+          <path
+            d="M5 12.5l4.5 4.5L19 7.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </span>
+      <h3 id="done-title">Terima kasih</h3>
+      <p>
+        Pesanan Anda sudah tercatat. Kami akan menghubungi Anda lewat WhatsApp
+        untuk konfirmasi dan pembayaran.
+      </p>
+      <div className="done-actions">
+        {shopWhatsapp && (
+          <a
+            className="button"
+            href={`https://wa.me/${shopWhatsapp}?text=${encodeURIComponent(message)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <SolarIcon name="bag-4" /> Kirim detail lewat WhatsApp
+          </a>
+        )}
+        <button type="button" className="button" onClick={onHome}>
+          Kembali ke Dashboard
+        </button>
+      </div>
+    </dialog>
+  );
+}
+
 function OrderForm({ product, variant, fields, resultUrl, options }) {
   const [typeValue, setTypeValue] = useState("");
   const [customer, setCustomer] = useState({
@@ -35,6 +83,7 @@ function OrderForm({ product, variant, fields, resultUrl, options }) {
   });
   const [status, setStatus] = useState({ busy: false, error: "", done: null });
   const { useCases } = useApp();
+  const navigate = useNavigate();
   const categories = options.categories ?? [];
   const type =
     categories.find((item) => item.value === typeValue && item.available) ??
@@ -105,26 +154,6 @@ function OrderForm({ product, variant, fields, resultUrl, options }) {
         Produk ini belum bisa dipesan online. Hubungi kami lewat WhatsApp untuk
         pemesanan.
       </p>
-    );
-  else if (status.done)
-    body = (
-      <div role="status">
-        <h3>Pesanan Anda sudah tercatat</h3>
-        <p>
-          Kami akan menghubungi Anda lewat WhatsApp untuk konfirmasi dan
-          pembayaran.
-        </p>
-        {shopWhatsapp && (
-          <a
-            className="button"
-            href={`https://wa.me/${shopWhatsapp}?text=${encodeURIComponent(status.done.message)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <SolarIcon name="bag-4" /> Kirim detail lewat WhatsApp
-          </a>
-        )}
-      </div>
     );
   else
     body = (
@@ -288,6 +317,12 @@ function OrderForm({ product, variant, fields, resultUrl, options }) {
           {type && <strong>{formatPrice(total)}</strong>}
         </div>
         {body}
+        {status.done && (
+          <DoneDialog
+            message={status.done.message}
+            onHome={() => navigate("/")}
+          />
+        )}
       </div>
     </section>
   );

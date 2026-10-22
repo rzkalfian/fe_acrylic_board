@@ -1353,6 +1353,16 @@ body:has(.catalog-page) .site-header .button {
   font-size: 11px;
   font-weight: 400;
 }
+
+.form-fields label:has(> .required) {
+  flex-flow: row wrap;
+  align-items: baseline;
+  gap: 8px 4px;
+}
+.form-fields label:has(> .required) > :is(input, select, textarea) {
+  flex: 0 0 100%;
+}
+
 .form-fields input,
 .form-fields select,
 .form-fields textarea {
@@ -2248,4 +2258,39 @@ textarea::placeholder {
 .order-type.disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+.done-dialog {
+  width: min(380px, calc(100% - 32px));
+  padding: 40px 32px 32px;
+  text-align: center;
+}
+.done-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--color-soft-pink);
+  color: var(--action);
+}
+.done-dialog h3 {
+  margin: 16px 0 8px;
+  font-size: 28px;
+  font-weight: 600;
+}
+.done-dialog p {
+  color: var(--muted);
+  font-size: 14px;
+}
+.done-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+.done-actions .button {
+  min-width: 200px;
+  border-radius: 8px;
 }

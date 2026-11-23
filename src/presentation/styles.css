@@ -303,23 +303,29 @@ p {
     right 650px;
 }
 .home-hero {
+  --flower-boost: clamp(0px, calc((100vw - 1440px) * 0.25), 160px);
   position: relative;
   background-color: transparent;
-  padding-top: 128px;
+  padding-top: max(180px, calc(180px + (100svh - 768px) / 4));
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
 }
-.home-hero::after {
+.hero-content::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: -80px 0 calc(-78px - var(--flower-boost));
   z-index: 2;
   pointer-events: none;
-  background: url("/assets/images/flower-logo.png") no-repeat calc(50% + 330px)
-    80px / auto 360px;
+  background: url("/assets/images/flower-logo.png") no-repeat right 12px center
+    / auto 100%;
 }
 .hero-content {
   position: relative;
   isolation: isolate;
-  padding: 24px 30px;
+  padding: 44px 30px;
+  margin-bottom: calc(60px + var(--flower-boost));
 }
 .hero-content::before {
   content: "";
@@ -346,7 +352,7 @@ p {
   max-width: 440px;
   color: #ffffffd9;
   font-size: 14px;
-  margin-bottom: 26px;
+  margin-bottom: 40px;
 }
 .hero-cta {
   display: flex;
@@ -366,7 +372,7 @@ p {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 36px;
-  padding-block: 27px 65px;
+  padding-block: 27px 64px;
 }
 .hero-services > div {
   display: flex;
@@ -419,7 +425,7 @@ body:has(.catalog-page) .site-header .button {
 .specialities {
   background: #bd5c80;
   color: #fff;
-  padding: 100px 0 100px;
+  padding: 140px 0;
   text-align: center;
 }
 .section-kicker {
@@ -494,7 +500,7 @@ body:has(.catalog-page) .site-header .button {
   opacity: 0.8;
 }
 .happiness {
-  padding: 84px 0;
+  padding: 124px 0;
   background:
     linear-gradient(#e8629f8c, #e9a1b9e6),
     url("/assets/background/flowers-background.png") center / cover;
@@ -1771,9 +1777,9 @@ textarea::placeholder {
   .hero-description {
     max-width: 450px;
   }
-  .home-hero::after {
-    background-position: calc(50% + 260px) 145px;
-    background-size: auto 370px;
+  .hero-content::after {
+    background-position: right 40px center;
+    background-size: auto 100%;
   }
   .hero-services {
     gap: 20px;
@@ -1822,8 +1828,13 @@ textarea::placeholder {
     background: #bd5c80;
     border-color: #ffffff59;
   }
+  .home-hero {
+    --flower-boost: 0px;
+    padding-top: 128px;
+    justify-content: flex-end;
+  }
   .hero-content {
-    padding: 24px;
+    padding: 40px 24px;
   }
   .hero-content::before {
     right: 0;
@@ -1835,9 +1846,17 @@ textarea::placeholder {
     max-width: 320px;
     font-size: 14px;
   }
+  .hero-content::after {
+    content: none;
+  }
   .home-hero::after {
-    background-position: calc(50% + 220px) 155px;
-    background-size: auto 280px;
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: url("/assets/images/flower-logo.png") no-repeat
+      calc(50% + 220px) 155px / auto 280px;
   }
   .hero-services {
     gap: 15px;
@@ -1968,7 +1987,7 @@ textarea::placeholder {
     padding-inline: 16px;
   }
   .hero-content {
-    padding: 24px 24px 185px;
+    padding: 40px 24px 185px;
   }
   .hero-content h1 {
     font-size: 46px;
